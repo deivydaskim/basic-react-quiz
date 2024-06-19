@@ -3,15 +3,21 @@ import Answers from './Answers';
 import { useState } from 'react';
 import QUESTIONS from '../questions';
 
-const Question = ({
-  index,
-  onSelectAnswer,
-  onSkipAnswer,
-}) => {
+const Question = ({ index, onSelectAnswer, onSkipAnswer }) => {
   const [answer, setAnswer] = useState({
     selectedAnswer: '',
     isCorrect: null,
   });
+
+  let timer = 10000;
+
+  if (answer.selectedAnswer) {
+    timer = 800;
+  }
+
+  if (answer.isCorrect !== null) {
+    timer = 2000;
+  }
 
   function HandleSelectAnswer(answer) {
     setAnswer({
@@ -27,8 +33,8 @@ const Question = ({
 
       setTimeout(() => {
         onSelectAnswer(answer);
-      }, 1500);
-    }, 500);
+      }, 2000);
+    }, 800);
   }
 
   let answerState = '';
@@ -41,7 +47,12 @@ const Question = ({
 
   return (
     <div id="question">
-      <QuestionTimer timeout={5000} onTimeout={onSkipAnswer} />
+      <QuestionTimer
+        key={timer}
+        timeout={timer}
+        onTimeout={answer.selectedAnswer === '' ? onSkipAnswer : null}
+        mode={answerState}
+      />
       <h2>{QUESTIONS[index].text}</h2>
       <Answers
         answers={QUESTIONS[index].answers}
