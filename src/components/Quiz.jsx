@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 
 import quizCompleteImg from '../assets/quiz-complete.png';
 import QUESTIONS from '../questions';
+import QuestionTimer from './QuestionTimer';
 
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
@@ -16,11 +17,19 @@ const Quiz = () => {
   const activeQuestionIndex = userAnswers.length;
   const quizIsComplete = activeQuestionIndex === QUESTIONS.length;
 
-  function HandleSelectAnswer(selectedAnswer) {
+  const HandleSelectAnswer = useCallback(function HandleSelectAnswer(
+    selectedAnswer
+  ) {
     setUserAnswers((prevAnswers) => {
       return [...prevAnswers, selectedAnswer];
     });
-  }
+  },
+  []);
+
+  const handleSkipAnswer = useCallback(
+    () => HandleSelectAnswer(null),
+    [HandleSelectAnswer]
+  );
 
   if (quizIsComplete) {
     return (
@@ -37,6 +46,11 @@ const Quiz = () => {
   return (
     <div id="quiz">
       <div id="questions">
+        <QuestionTimer
+          key={activeQuestionIndex}
+          timeout={5000}
+          onTimeout={handleSkipAnswer}
+        />
         <h2>{QUESTIONS[activeQuestionIndex].text}</h2>
         <ul id="answers">
           {shuffeledAnswers.map((answer) => (
